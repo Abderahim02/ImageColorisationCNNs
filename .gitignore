@@ -1,0 +1,5 @@
+chromagan_model/MODEL/*
+chromagan_model/.ipynb_checkpoints/*
+rgb_model/coco_dataset
+rgb_model/__pycache__
+rgb_model/*.zip
