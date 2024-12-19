@@ -182,13 +182,8 @@ def convert_lab_to_rgb(l_channel, ab_channels):
     return rgb
 # Updated function to include SSIM and PSNR metrics
 def predict_lab(model, dataset, out_dir = 'PREDICTIONS', prefix = "LAB"):
-
-    losses = []
-    ssim_values = []
-    psnr_values = []
-
     # Take a batch of images
-    for batch, ground_truth, l in dataset.take(1):
+    for batch, ground_truth, l in dataset:
         # Only take 1 batch for visualization
         l_inputs = batch
         # l_inputs = l_inputs[:num_images]  # Limit the number of images
@@ -211,13 +206,7 @@ def predict_lab(model, dataset, out_dir = 'PREDICTIONS', prefix = "LAB"):
             pred_rgb = convert_lab_to_rgb(l_channel, ab_channels_pred)
             img = (np.array(pred_rgb) * 255).astype(np.uint8)  # Convert to 8-bit format
             Image.fromarray(img).save(f"{out_dir}/{prefix}_{timestamp}_{i}.png")
-            gt_rgb = convert_lab_to_rgb(l_channel, ab_channels_gt)
-            # Calculate SSIM and PSNR
-            ssim_value = tf.image.ssim(pred_rgb, gt_rgb, max_val=1.0)
-            psnr_value = tf.image.psnr(pred_rgb, gt_rgb, max_val=1.0)
 
-            ssim_values.append(ssim_value.numpy())
-            psnr_values.append(psnr_value.numpy())
 
 
 class SaveModelEveryNEpochs(Callback):

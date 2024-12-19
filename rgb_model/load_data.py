@@ -35,7 +35,7 @@ def preprocess_with_mask(image, num_hints):
     return (grayscale, color_mask), image
 
 
-def load_data(data_dir, model_type, image_size=(256, 256), batch_size=8, hint_size=10):
+def load_data(data_dir, model_type, image_size=(256, 256), batch_size=8, num_hints=10):
     dataset = tf.keras.utils.image_dataset_from_directory(
         data_dir,
         labels=None,
@@ -45,7 +45,7 @@ def load_data(data_dir, model_type, image_size=(256, 256), batch_size=8, hint_si
     )
     if model_type == "mask":
         num_pixels = image_size[0] * image_size[1]
-        num_hints = int(hint_size * num_pixels)
+        num_hints = num_hints
         colorization_dataset = dataset.map(lambda x: preprocess_with_mask(x, num_hints), num_parallel_calls=tf.data.experimental.AUTOTUNE)
     elif model_type == "mse" or model_type == "perc":
         colorization_dataset = dataset.map(preprocess_for_colorization, num_parallel_calls=tf.data.experimental.AUTOTUNE)
@@ -58,3 +58,20 @@ def load_data(data_dir, model_type, image_size=(256, 256), batch_size=8, hint_si
 
     return train_dataset, val_dataset
 
+
+def load_inference_data(data_dir, model_type, num_hints = 10, image_size=(256, 256), batch_size=8):
+    dataset = tf.keras.utils.image_dataset_from_directory(
+        data_dir,
+        labels=None,
+        image_size=image_size,
+        batch_size=batch_size,
+        shuffle=True
+    )
+
+    if model_type == "mask":
+        colorization_dataset = dataset.map(lambda x: preprocess_with_mask(x, num_hints), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    else :
+        colorization_dataset = dataset.map(preprocess_for_colorization, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    val_dataset = colorization_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    return val_dataset
