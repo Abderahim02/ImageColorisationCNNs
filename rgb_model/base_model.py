@@ -1,13 +1,18 @@
+import tensorflow as tf
 from keras.models import Sequential, Model
-from keras.layers import Conv2D, UpSampling2D, InputLayer, BatchNormalization, Input
+from keras.layers import Conv2D, UpSampling2D, InputLayer
 from keras.applications import VGG19
-from keras.callbacks import Callback
+from help_functions import  psnr, ssim
+from tensorflow.keras.optimizers import Adam
+
+
+
 
 
 def build_colorization_model(input_shape):
+    print(input_shape)
     model = Sequential()
     model.add(InputLayer(shape=input_shape))
-    print(input_shape)
     # Encoder
     model.add(Conv2D(64, (3, 3), activation='relu', padding='same', strides=2))
     model.add(Conv2D(128, (3, 3), activation='relu', padding='same'))
@@ -41,20 +46,18 @@ def perceptual_loss(y_true, y_pred):
 
 
 
-def create_base_model(image_size):
-    input_shape = (image_size[0], image_size[1], 1)  # Grayscale images have 1 channel
+def create_base_model_perceptual(image_size , learning_rate = 0.0005):
+    input_shape = (image_size[0], image_size[1], 1)
+    print(input_shape)
     model = build_colorization_model(input_shape)
-    # model.compile(optimizer='adam', loss='mse', metrics=['mae'])
-    model.compile(optimizer='adam', loss = perceptual_loss, metrics=['mae'])
+    model.compile(optimizer=Adam(learning_rate = learning_rate), loss = perceptual_loss, metrics=['mae', 'mse', psnr, ssim])
     model.summary()
     return model
-    
-def fit_base_model(model, train_dataset, val_dataset, save_path, n_epochs = 10, save_interval = 10):
-    save_callback = SaveModelEveryNEpochs(save_path=save_path, interval=save_interval)
-    history = model.fit(
-        train_dataset,
-        validation_data=val_dataset,
-        epochs=n_epochs,
-        callbacks=[save_callback]
-    )
-    return history
+
+
+def create_base_model_mse(image_size, learning_rate = 0.0005):
+    input_shape = (image_size[0], image_size[1], 1)
+    model = build_colorization_model(input_shape)
+    model.compile(optimizer=Adam(learning_rate = learning_rate), loss = 'mse', metrics=['mae', 'mse', psnr, ssim])
+    model.summary()
+    return model

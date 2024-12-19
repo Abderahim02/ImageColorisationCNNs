@@ -1,14 +1,15 @@
 from keras.layers import Concatenate, Input
 from keras.models import Sequential, Model
-from keras.layers import Conv2D, UpSampling2D, InputLayer, BatchNormalization, Input
-from keras.applications import VGG19
+from keras.layers import Conv2D, UpSampling2D, Input
+from help_functions import SaveModelEveryNEpochs, psnr, ssim
+from tensorflow.keras.optimizers import Adam
 def build_colorization_model_with_mask(input_shape):
     # Inputs
-    grayscale_input = Input(shape=input_shape, name="grayscale_input")  # (128, 128, 1)
-    mask_input = Input(shape=(input_shape[0], input_shape[1], 3), name="mask_input")  # (128, 128, 3)
+    grayscale_input = Input(shape=input_shape, name="grayscale_input")  
+    mask_input = Input(shape=(input_shape[0], input_shape[1], 3), name="mask_input") 
 
     # Concatenate grayscale and mask
-    x = Concatenate()([grayscale_input, mask_input])  # (128, 128, 4)
+    x = Concatenate()([grayscale_input, mask_input])  
 
     # Encoder
     x = Conv2D(64, (3, 3), activation='relu', padding='same', strides=2)(x)
@@ -34,7 +35,7 @@ def build_colorization_model_with_mask(input_shape):
 
 
 
-def create_mask_model():
+def create_mask_model( image_size):
     input_shape = (image_size[0], image_size[1], 1)  
     model_mask = build_colorization_model_with_mask(input_shape)
     model_mask.summary()
@@ -42,13 +43,10 @@ def create_mask_model():
     return model_mask
     
 
-def fit_mask_model(model, train_dataset, val_dataset, save_path, n_epochs = 10, save_interval = 10):
-    
-    save_callback = SaveModelEveryNEpochs(save_path=save_path, interval=save_interval)
-    history = model.fit(
-        train_dataset,
-        validation_data=val_dataset,
-        epochs=n_epochs,
-        callbacks=[save_callback]
-    )
-    return history
+def create_mask_model(image_size , learning_rate = 0.0005):
+    input_shape = (image_size[0], image_size[1], 1)
+    model = build_colorization_model_with_mask(input_shape)
+    model.compile(optimizer=Adam(learning_rate = learning_rate), loss = 'mse', metrics=['mae', 'mse', psnr, ssim])
+    model.summary()
+    return model
+

@@ -1,10 +1,38 @@
-
-
+import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 import matplotlib.pyplot as plt
 from keras.callbacks import Callback
+import json
+
+
+
+
+
+def psnr(y_true, y_pred):
+    max_pixel = 1.0  
+    # print(y_true.shape, y_pred.shape)
+    return tf.image.psnr(y_true, y_pred, max_val=max_pixel)
+
+def ssim(y_true, y_pred):
+    max_pixel = 1.0  
+    return tf.image.ssim(y_true, y_pred, max_val=max_pixel)
+def save_loss(history, path):
+    with open(path + ".json", 'w') as f:
+        json.dump(history.history, f)
+        print(f"Model metrics savec at {path + ".json"} ")
+
+def train_model(model, train_dataset, val_dataset, save_path, save_loss_path, n_epochs = 5, save_interval = 1):
+    save_callback = SaveModelEveryNEpochs(save_path=save_path, interval=save_interval)
+
+    history = model.fit(
+        train_dataset,
+        validation_data=val_dataset,
+        epochs=n_epochs,
+        callbacks=[save_callback]
+    )
+    save_loss(history, save_loss_path)
 
 
 def display_from_dataset(dataset, num_images=5):
@@ -45,7 +73,7 @@ def load_grayscale_image(image_path, target_size):
     return tf.expand_dims(image, axis=0)  
 
 
-def prediction_examples(model, data):
+def predict_and_visualize_rgb(model, data):
     for grayscale_batch, rgb_batch in data.take(1):
         predicted_rgb = model.predict(grayscale_batch)
         # Initialize PSNR and SSIM lists
