@@ -7,6 +7,8 @@ from keras.callbacks import Callback
 import json
 
 
+from PIL import Image
+import datetime
 
 
 
@@ -316,13 +318,11 @@ class SaveModelEveryNEpochs(Callback):
             print(f"Model saved at {save_path_with_epoch}")
 
 
-from PIL import Image
-import datetime
 def predict_rgb(model, data, prefix="RGB", out_dir="PREDICTIONS"):
     for grayscale_batch, rgb_batch in data:
         predicted_rgb = model.predict(grayscale_batch)
 
-        for i in range(5):  # Display 5 examples
+        for i in range(grayscale_batch.shape[0]):  
             true_image = rgb_batch[i].numpy()
             pred_image = np.clip(predicted_rgb[i], 0, 1)  # Ensure predictions are in [0, 1]
             img = (pred_image * 255).astype(np.uint8)  # Convert to 8-bit format

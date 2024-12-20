@@ -1,0 +1,22 @@
+# LAB and RGB model
+tensorflow
+tensorflow-io
+keras
+numpy
+opencv-python
+scikit-image
+matplotlib
+pillow
+pathlib
+
+# GAN model
+torch
+torchvision
+Pillow
+scikit-image
+numpy
+opencv-python
+matplotlib
+tensorboard
+piq
+tqdm
