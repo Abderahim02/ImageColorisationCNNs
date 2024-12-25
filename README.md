@@ -45,9 +45,9 @@ pip install -r requirements.txt
 
 
 # Run inference with base model
-python main.py base /path/to/data --model_path models/base_model.h5 --out_dir PREDICTIONS
+python lab_model/main.py base /path/to/data --model_path models/base_model.h5 --out_dir PREDICTIONS
 
 # Run inference with VGG model
-python main.py vgg_based /path/to/data --model_path models/vgg_model.h5 --out_dir predictions
+python lab_model/main.py vgg_based /path/to/data --model_path models/vgg_model.h5 --out_dir predictions
 ```
 
