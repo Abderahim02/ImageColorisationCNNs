@@ -10,6 +10,7 @@ This project implements various approaches for automatic image colorisation:
 
 
 # Project Structure
+```  
 ├── lab_model
 │   ├── PREDICTIONS
 │   ├── base_model.py
@@ -29,6 +30,7 @@ This project implements various approaches for automatic image colorisation:
 │   ├── model_with_mask.py
 │   ├── PREDICTIONS
 │   ├── train.py
+```
 
 ## Installation
 ```bash
