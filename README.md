@@ -19,7 +19,6 @@ This project implements various approaches for automatic image colorisation:
 │   ├── main.py
 │   ├── model_with_vgg16.py
 │   └── train.py
-├── Makefile
 ├── MODELS
 ├── README.md
 ├── rgb_model
